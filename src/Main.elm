@@ -1,9 +1,12 @@
 module Main exposing (..)
 
 import App exposing (..)
-import Html exposing (programWithFlags)
+import Html exposing (program)
 
-
-main : Program String Model Msg
 main =
-    programWithFlags { view = view, init = init, update = update, subscriptions = subscriptions }
+  program
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = subscriptions
+    }
