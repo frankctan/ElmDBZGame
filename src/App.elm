@@ -67,6 +67,7 @@ encodeJsonPlayerAction record =
         , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
         ]
 
+-- msg
 
 type alias JsonString = String
 
@@ -79,8 +80,8 @@ type Msg
   | FindMatch
   -- What action did the player pick?
   | ChooseAction PlayerAction
-  -- What action did the player lock in?
-  | LockInAction PlayerAction
+  -- Send action chosen to server.
+  | LockInAction
   -- What is the server telling the client?
   | UpdateModel JsonString
 
@@ -100,47 +101,35 @@ update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     InputUsername str ->
-      ( { model | username = str }, Cmd.none )
+      ( { model | currentPlayerUsername = str }, Cmd.none )
 
     InputMatchName str ->
-      ( { model | matchName = str}, Cmd.none )
+      let m = model.match in
+        ( { model | match = Match m.name m.players m.turnNumber }, Cmd.none )
 
     FindMatch ->
-      -- TODO: Call websockets. WebSocket.send webSocketServer jsonStr
-      ( model, Cmd.none )
+      ( model
+      , WebSocket.send webSocketServer
+          <| encodeFindMatchToStr
+          <| jsonFindMatchInit model
+      )
 
     ChooseAction action ->
       ( { model | selectedAction = action }, Cmd.none )
 
-    LockInAction action ->
+    LockInAction ->
       -- TODO: Call websockets. WebSocket.send webSocketServer jsonStr
       ( model, Cmd.none )
-
-    PayloadInput str ->
-      ( { model | payload = str }, Cmd.none )
 
     UpdateModel str ->
       -- TODO: Update model based on server
       ( model, Cmd.none )
 
-encodeToJsonString: (String, String) -> String
-encodeToJsonString (a, b) =
-  -- (String, String) -> List (String, Json.Encode.Value) -> encoded string
-  Json.Encode.encode 0
-    <| Json.Encode.object
-    <| [("username", Json.Encode.string a), ("payload", (Json.Encode.string b) )]
-
-decodeJsonString: String -> (Dict String String)
-decodeJsonString json =
-  case Json.Decode.decodeString (Json.Decode.dict Json.Decode.string) json of
-    Ok value -> value
-    Err error -> singleton "Error" error
-
 -- subscriptions
 
 subscriptions: Model -> Sub Msg
 subscriptions model =
-  WebSocket.listen webSocketServer IncomingMessage
+  WebSocket.listen webSocketServer UpdateModel
 
 -- view
 
