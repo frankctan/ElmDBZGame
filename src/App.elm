@@ -28,7 +28,7 @@ type alias Player =
 
 type alias Match =
   { name: String
-  , players: [Player]
+  , players: List Player
   , turnNumber: Int
   }
 
