@@ -44,6 +44,10 @@ type alias JsonPlayerAction =
   , playerAction: PlayerAction
   }
 
+jsonFindMatchInit: Model -> JsonFindMatch
+jsonFindMatchInit model =
+  JsonFindMatch model.currentPlayerUsername model.match.name
+
 encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
 encodeJsonFindMatch record =
     Json.Encode.object
@@ -51,12 +55,16 @@ encodeJsonFindMatch record =
         , ("matchName",  Json.Encode.string <| record.matchName)
         ]
 
+encodeFindMatchToStr: JsonFindMatch -> String
+encodeFindMatchToStr record =
+  Json.Encode.encode 0 (encodeJsonFindMatch record)
+
 encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
 encodeJsonPlayerAction record =
     Json.Encode.object
         [ ("username",  Json.Encode.string <| record.username)
         , ("matchName",  Json.Encode.string <| record.matchName)
-        , ("playerAction",  encodePlayerAction <| record.playerAction)
+        , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
         ]
 
 
