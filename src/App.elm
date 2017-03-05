@@ -67,6 +67,8 @@ type Msg
   = InputUsername String
   -- What is the name of the match?
   | InputMatchName String
+  -- Tell the server to find or create a new match
+  | FindMatch
   -- What action did the player pick?
   | ChooseAction PlayerAction
   -- What action did the player lock in?
