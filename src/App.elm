@@ -50,10 +50,10 @@ jsonFindMatchInit model =
 
 encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
 encodeJsonFindMatch record =
-    Json.Encode.object
-        [ ("username",  Json.Encode.string <| record.username)
-        , ("matchName",  Json.Encode.string <| record.matchName)
-        ]
+  Json.Encode.object
+    [ ("username",  Json.Encode.string <| record.username)
+    , ("matchName",  Json.Encode.string <| record.matchName)
+    ]
 
 encodeFindMatchToStr: JsonFindMatch -> String
 encodeFindMatchToStr record =
@@ -61,11 +61,11 @@ encodeFindMatchToStr record =
 
 encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
 encodeJsonPlayerAction record =
-    Json.Encode.object
-        [ ("username",  Json.Encode.string <| record.username)
-        , ("matchName",  Json.Encode.string <| record.matchName)
-        , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
-        ]
+  Json.Encode.object
+    [ ("username",  Json.Encode.string <| record.username)
+    , ("matchName",  Json.Encode.string <| record.matchName)
+    , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
+    ]
 
 -- msg
 
