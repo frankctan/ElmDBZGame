@@ -5,8 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import WebSocket
 import Json.Encode
-import Json.Decode
-import Dict exposing (..)
+-- import Json.Decode
+-- import Dict exposing (..)
 
 -- init
 init: (Model, Cmd Msg)
