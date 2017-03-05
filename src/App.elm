@@ -91,32 +91,29 @@ webSocketServer =
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    UserNameInput str ->
+    InputUsername str ->
       ( { model | username = str }, Cmd.none )
+
+    InputMatchName str ->
+      ( { model | matchName = str}, Cmd.none )
+
+    FindMatch ->
+      -- TODO: Call websockets. WebSocket.send webSocketServer jsonStr
+      ( model, Cmd.none )
+
+    ChooseAction action ->
+      ( { model | selectedAction = action }, Cmd.none )
+
+    LockInAction action ->
+      -- TODO: Call websockets. WebSocket.send webSocketServer jsonStr
+      ( model, Cmd.none )
 
     PayloadInput str ->
       ( { model | payload = str }, Cmd.none )
 
-    Send ->
-      let
-        jsonStr: String
-        jsonStr =
-           encodeToJsonString ( model.username, model.payload )
-           in
-            -- (Model "" "" model.results, WebSocket.send webSocketServer jsonStr)
-              ({ model | username = "", payload = "" }, WebSocket.send webSocketServer jsonStr)
-
-    IncomingMessage str ->
-      let jsonDict = decodeJsonString str
-          message = case get "message" jsonDict of
-            Just m -> m
-            Nothing -> "Nothing!"
-              in
-                (Model "" "" (message :: model.results), Cmd.none)
-
-    SelectAction playerAction ->
-      ({ model | selectedAction = playerAction }, Cmd.none)
-
+    UpdateModel str ->
+      -- TODO: Update model based on server
+      ( model, Cmd.none )
 
 encodeToJsonString: (String, String) -> String
 encodeToJsonString (a, b) =
