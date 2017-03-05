@@ -48,6 +48,13 @@ jsonFindMatchInit: Model -> JsonFindMatch
 jsonFindMatchInit model =
   JsonFindMatch model.currentPlayerUsername model.match.name
 
+jsonPlayerActionInit: Model -> JsonPlayerAction
+jsonPlayerActionInit model =
+  JsonPlayerAction
+    model.currentPlayerUsername
+    model.match.name
+    model.selectedAction
+
 encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
 encodeJsonFindMatch record =
   Json.Encode.object
@@ -57,7 +64,7 @@ encodeJsonFindMatch record =
 
 encodeFindMatchToStr: JsonFindMatch -> String
 encodeFindMatchToStr record =
-  Json.Encode.encode 0 (encodeJsonFindMatch record)
+  Json.Encode.encode 0 <| encodeJsonFindMatch record
 
 encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
 encodeJsonPlayerAction record =
@@ -66,6 +73,10 @@ encodeJsonPlayerAction record =
     , ("matchName",  Json.Encode.string <| record.matchName)
     , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
     ]
+
+encodePlayerActionToStr: JsonPlayerAction -> String
+encodePlayerActionToStr action =
+  Json.Encode.encode 0 <| encodeJsonPlayerAction action
 
 -- msg
 
@@ -105,7 +116,7 @@ update msg model =
 
     InputMatchName str ->
       let m = model.match in
-        ( { model | match = Match m.name m.players m.turnNumber }, Cmd.none )
+        ( { model | match = Match str m.players m.turnNumber }, Cmd.none )
 
     FindMatch ->
       ( model
@@ -118,8 +129,11 @@ update msg model =
       ( { model | selectedAction = action }, Cmd.none )
 
     LockInAction ->
-      -- TODO: Call websockets. WebSocket.send webSocketServer jsonStr
-      ( model, Cmd.none )
+      ( model
+      , WebSocket.send webSocketServer
+          <| encodePlayerActionToStr
+          <| jsonPlayerActionInit model
+      )
 
     UpdateModel str ->
       -- TODO: Update model based on server
