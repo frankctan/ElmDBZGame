@@ -32,8 +32,33 @@ type alias Match =
   , turnNumber: Int
   }
 
+-- JSON records
+type alias JsonFindMatch =
+  { username: String
   , matchName: String
   }
+
+type alias JsonPlayerAction =
+  { username: String
+  , matchName: String
+  , playerAction: PlayerAction
+  }
+
+encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
+encodeJsonFindMatch record =
+    Json.Encode.object
+        [ ("username",  Json.Encode.string <| record.username)
+        , ("matchName",  Json.Encode.string <| record.matchName)
+        ]
+
+encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
+encodeJsonPlayerAction record =
+    Json.Encode.object
+        [ ("username",  Json.Encode.string <| record.username)
+        , ("matchName",  Json.Encode.string <| record.matchName)
+        , ("playerAction",  encodePlayerAction <| record.playerAction)
+        ]
+
 
 type alias JsonString = String
 
