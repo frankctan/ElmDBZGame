@@ -1,110 +1,17 @@
 module App exposing (..)
 
+import Model exposing (..)
+import Msg exposing (..)
+import Subscriptions exposing (..)
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import WebSocket
-import Json.Encode
--- import Json.Decode
--- import Dict exposing (..)
 
 -- init
 init: (Model, Cmd Msg)
 init =
   (Model "" Block (Match "" [] 0), Cmd.none)
-
--- Model
-type alias Model =
-  { currentPlayerUsername: String
-  , selectedAction: PlayerAction
-  , match: Match
-  }
-
-type alias Player =
-  { username: String
-  , charges: Int
-  , health: Int
-  }
-
-type alias Match =
-  { name: String
-  , players: List Player
-  , turnNumber: Int
-  }
-
--- JSON records
-type alias JsonFindMatch =
-  { username: String
-  , matchName: String
-  }
-
-type alias JsonPlayerAction =
-  { username: String
-  , matchName: String
-  , playerAction: PlayerAction
-  }
-
-jsonFindMatchInit: Model -> JsonFindMatch
-jsonFindMatchInit model =
-  JsonFindMatch model.currentPlayerUsername model.match.name
-
-jsonPlayerActionInit: Model -> JsonPlayerAction
-jsonPlayerActionInit model =
-  JsonPlayerAction
-    model.currentPlayerUsername
-    model.match.name
-    model.selectedAction
-
-encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
-encodeJsonFindMatch record =
-  Json.Encode.object
-    [ ("username",  Json.Encode.string <| record.username)
-    , ("matchName",  Json.Encode.string <| record.matchName)
-    ]
-
-encodeFindMatchToStr: JsonFindMatch -> String
-encodeFindMatchToStr record =
-  Json.Encode.encode 0 <| encodeJsonFindMatch record
-
-encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
-encodeJsonPlayerAction record =
-  Json.Encode.object
-    [ ("username",  Json.Encode.string <| record.username)
-    , ("matchName",  Json.Encode.string <| record.matchName)
-    , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
-    ]
-
-encodePlayerActionToStr: JsonPlayerAction -> String
-encodePlayerActionToStr action =
-  Json.Encode.encode 0 <| encodeJsonPlayerAction action
-
--- msg
-
-type alias JsonString = String
-
-type Msg
-  -- Who is the current Player?
-  = InputUsername String
-  -- What is the name of the match?
-  | InputMatchName String
-  -- Tell the server to find or create a new match
-  | FindMatch
-  -- What action did the player pick?
-  | ChooseAction PlayerAction
-  -- Send action chosen to server.
-  | LockInAction
-  -- What is the server telling the client?
-  | UpdateModel JsonString
-
-type PlayerAction
-   = Block
-   | Charge
-   | Shoot
-   | Steal
-
-webSocketServer : String
-webSocketServer =
-  "ws://localhost:8080/ws"
 
 -- update
 
@@ -119,31 +26,17 @@ update msg model =
         ( { model | match = Match str m.players m.turnNumber }, Cmd.none )
 
     FindMatch ->
-      ( model
-      , WebSocket.send webSocketServer
-          <| encodeFindMatchToStr
-          <| jsonFindMatchInit model
-      )
+      ( model, wsSendFindMatch model )
 
     ChooseAction action ->
       ( { model | selectedAction = action }, Cmd.none )
 
     LockInAction ->
-      ( model
-      , WebSocket.send webSocketServer
-          <| encodePlayerActionToStr
-          <| jsonPlayerActionInit model
-      )
+      ( model, wsSendPlayerAction model )
 
     UpdateModel str ->
       -- TODO: Update model based on server
       ( model, Cmd.none )
-
--- subscriptions
-
-subscriptions: Model -> Sub Msg
-subscriptions model =
-  WebSocket.listen webSocketServer UpdateModel
 
 -- view
 
