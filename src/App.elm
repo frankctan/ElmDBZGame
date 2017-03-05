@@ -11,21 +11,47 @@ import Dict exposing (..)
 -- init
 init: (Model, Cmd Msg)
 init =
-  (Model "" "" [], Cmd.none)
+  (Model "" "" [] Block, Cmd.none)
 
 -- model
-
 type alias Model =
-  { username: String
-  , payload: String
-  , results: List String
+  { currentPlayer: Player
+  , selectedAction: PlayerAction
+  , players: [Player]
+  , match: Match
   }
 
+type alias Player =
+  { username: String
+  , charges: Int
+  , health: Int
+  }
+
+type alias Match =
+  { name: String
+  , turnNumber: Int
+  , matchName: String
+  }
+
+type alias JsonString = String
+
 type Msg
-  = UserNameInput String
-  | PayloadInput String
-  | IncomingMessage String
-  | Send
+  -- Who is the current Player?
+  = InputUsername String
+  -- What is the name of the match?
+  | InputMatchName String
+  -- What action did the player pick?
+  | ChooseAction PlayerAction
+  -- What action did the player lock in?
+  | LockInAction PlayerAction
+  -- What is the server telling the client?
+  | UpdateModel JsonString
+
+type PlayerAction
+   = Block
+   | Charge
+   | Shoot
+   | Steal
 
 webSocketServer : String
 webSocketServer =
@@ -58,6 +84,10 @@ update msg model =
             Nothing -> "Nothing!"
               in
                 (Model "" "" (message :: model.results), Cmd.none)
+
+    SelectAction playerAction ->
+      ({ model | selectedAction = playerAction }, Cmd.none)
+
 
 encodeToJsonString: (String, String) -> String
 encodeToJsonString (a, b) =
@@ -93,6 +123,15 @@ view model =
                 , value model.payload
                 ] []
         , button [onClick Send] [ text "Send" ]
+        ]
+      -- Display player actions here.
+    , div []
+        [
+          button [ onClick (SelectAction Shoot) ] [ text "Shoot" ]
+        ]
+    , div []
+        [
+          button [ onClick Send ] [text "Lock In"]
         ]
     , div [] (List.map viewResult model.results)
     ]
