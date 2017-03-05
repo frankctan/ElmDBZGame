@@ -11,7 +11,7 @@ import Json.Encode
 -- init
 init: (Model, Cmd Msg)
 init =
-  (Model "" "" [] Block, Cmd.none)
+  (Model "" Block (Match "" [] 0), Cmd.none)
 
 -- Model
 type alias Model =
