@@ -13,11 +13,10 @@ init: (Model, Cmd Msg)
 init =
   (Model "" "" [] Block, Cmd.none)
 
--- model
+-- Model
 type alias Model =
-  { currentPlayer: Player
+  { currentPlayerUsername: String
   , selectedAction: PlayerAction
-  , players: [Player]
   , match: Match
   }
 
@@ -29,7 +28,10 @@ type alias Player =
 
 type alias Match =
   { name: String
+  , players: [Player]
   , turnNumber: Int
+  }
+
   , matchName: String
   }
 
