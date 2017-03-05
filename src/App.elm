@@ -137,28 +137,28 @@ view : Model -> Html Msg
 view model =
   div []
     [ input [ placeholder "Username"
-            , onInput UserNameInput
-            , value model.username
+            , onInput InputUsername
+            , value model.currentPlayerUsername
             ] []
     , div []
-        [ input [ placeholder "payload to send"
-                , onInput PayloadInput
-                , value model.payload
+        [ input [ placeholder "Match Name"
+                , onInput InputMatchName
+                , value model.match.name
                 ] []
-        , button [onClick Send] [ text "Send" ]
+        , button [onClick FindMatch] [ text "FindMatch" ]
         ]
       -- Display player actions here.
     , div []
         [
-          button [ onClick (SelectAction Shoot) ] [ text "Shoot" ]
+          button [ onClick (ChooseAction Shoot) ] [ text "Shoot" ]
         ]
     , div []
         [
-          button [ onClick Send ] [text "Lock In"]
+          button [ onClick LockInAction ] [text "Lock In"]
         ]
-    , div [] (List.map viewResult model.results)
+    -- , div [] (List.map viewResult model.results)
     ]
 
-viewResult: String -> Html Msg
-viewResult result =
-  div [] [ text result ]
+-- viewResult: String -> Html Msg
+-- viewResult result =
+--   div [] [ text result ]
