@@ -1,13 +1,15 @@
-module Subscriptions exposing ( subscriptions
-                              , wsSendFindMatch
-                              , wsSendPlayerAction )
+module WebSocketsComm exposing ( wsListen
+                               , wsSendFindMatch
+                               , wsSendPlayerAction )
 import WebSocket
-import Model
+import Model exposing (..)
+import Msg exposing (..)
 import Json.Encode
 
-subscriptions: Model -> Sub Msg
-subscriptions model =
+wsListen: () -> Sub Msg
+wsListen () =
   WebSocket.listen webSocketServer UpdateModel
+
 
 wsSendFindMatch: Model -> Cmd Msg
 wsSendFindMatch model =

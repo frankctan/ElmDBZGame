@@ -2,7 +2,7 @@ module App exposing (..)
 
 import Model exposing (..)
 import Msg exposing (..)
-import Subscriptions exposing (..)
+import WebSocketsComm exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -37,6 +37,12 @@ update msg model =
     UpdateModel str ->
       -- TODO: Update model based on server
       ( model, Cmd.none )
+
+-- subscriptions
+
+subscriptions: Model -> Sub Msg
+subscriptions model =
+  wsListen ()
 
 -- view
 
