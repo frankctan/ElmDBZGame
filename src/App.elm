@@ -5,27 +5,102 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import WebSocket
 import Json.Encode
-import Json.Decode
-import Dict exposing (..)
+-- import Json.Decode
+-- import Dict exposing (..)
 
 -- init
 init: (Model, Cmd Msg)
 init =
-  (Model "" "" [], Cmd.none)
+  (Model "" Block (Match "" [] 0), Cmd.none)
 
--- model
-
+-- Model
 type alias Model =
-  { username: String
-  , payload: String
-  , results: List String
+  { currentPlayerUsername: String
+  , selectedAction: PlayerAction
+  , match: Match
   }
 
+type alias Player =
+  { username: String
+  , charges: Int
+  , health: Int
+  }
+
+type alias Match =
+  { name: String
+  , players: List Player
+  , turnNumber: Int
+  }
+
+-- JSON records
+type alias JsonFindMatch =
+  { username: String
+  , matchName: String
+  }
+
+type alias JsonPlayerAction =
+  { username: String
+  , matchName: String
+  , playerAction: PlayerAction
+  }
+
+jsonFindMatchInit: Model -> JsonFindMatch
+jsonFindMatchInit model =
+  JsonFindMatch model.currentPlayerUsername model.match.name
+
+jsonPlayerActionInit: Model -> JsonPlayerAction
+jsonPlayerActionInit model =
+  JsonPlayerAction
+    model.currentPlayerUsername
+    model.match.name
+    model.selectedAction
+
+encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
+encodeJsonFindMatch record =
+  Json.Encode.object
+    [ ("username",  Json.Encode.string <| record.username)
+    , ("matchName",  Json.Encode.string <| record.matchName)
+    ]
+
+encodeFindMatchToStr: JsonFindMatch -> String
+encodeFindMatchToStr record =
+  Json.Encode.encode 0 <| encodeJsonFindMatch record
+
+encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
+encodeJsonPlayerAction record =
+  Json.Encode.object
+    [ ("username",  Json.Encode.string <| record.username)
+    , ("matchName",  Json.Encode.string <| record.matchName)
+    , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
+    ]
+
+encodePlayerActionToStr: JsonPlayerAction -> String
+encodePlayerActionToStr action =
+  Json.Encode.encode 0 <| encodeJsonPlayerAction action
+
+-- msg
+
+type alias JsonString = String
+
 type Msg
-  = UserNameInput String
-  | PayloadInput String
-  | IncomingMessage String
-  | Send
+  -- Who is the current Player?
+  = InputUsername String
+  -- What is the name of the match?
+  | InputMatchName String
+  -- Tell the server to find or create a new match
+  | FindMatch
+  -- What action did the player pick?
+  | ChooseAction PlayerAction
+  -- Send action chosen to server.
+  | LockInAction
+  -- What is the server telling the client?
+  | UpdateModel JsonString
+
+type PlayerAction
+   = Block
+   | Charge
+   | Shoot
+   | Steal
 
 webSocketServer : String
 webSocketServer =
@@ -36,47 +111,39 @@ webSocketServer =
 update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    UserNameInput str ->
-      ( { model | username = str }, Cmd.none )
+    InputUsername str ->
+      ( { model | currentPlayerUsername = str }, Cmd.none )
 
-    PayloadInput str ->
-      ( { model | payload = str }, Cmd.none )
+    InputMatchName str ->
+      let m = model.match in
+        ( { model | match = Match str m.players m.turnNumber }, Cmd.none )
 
-    Send ->
-      let
-        jsonStr: String
-        jsonStr =
-           encodeToJsonString ( model.username, model.payload )
-           in
-            -- (Model "" "" model.results, WebSocket.send webSocketServer jsonStr)
-              ({ model | username = "", payload = "" }, WebSocket.send webSocketServer jsonStr)
+    FindMatch ->
+      ( model
+      , WebSocket.send webSocketServer
+          <| encodeFindMatchToStr
+          <| jsonFindMatchInit model
+      )
 
-    IncomingMessage str ->
-      let jsonDict = decodeJsonString str
-          message = case get "message" jsonDict of
-            Just m -> m
-            Nothing -> "Nothing!"
-              in
-                (Model "" "" (message :: model.results), Cmd.none)
+    ChooseAction action ->
+      ( { model | selectedAction = action }, Cmd.none )
 
-encodeToJsonString: (String, String) -> String
-encodeToJsonString (a, b) =
-  -- (String, String) -> List (String, Json.Encode.Value) -> encoded string
-  Json.Encode.encode 0
-    <| Json.Encode.object
-    <| [("username", Json.Encode.string a), ("payload", (Json.Encode.string b) )]
+    LockInAction ->
+      ( model
+      , WebSocket.send webSocketServer
+          <| encodePlayerActionToStr
+          <| jsonPlayerActionInit model
+      )
 
-decodeJsonString: String -> (Dict String String)
-decodeJsonString json =
-  case Json.Decode.decodeString (Json.Decode.dict Json.Decode.string) json of
-    Ok value -> value
-    Err error -> singleton "Error" error
+    UpdateModel str ->
+      -- TODO: Update model based on server
+      ( model, Cmd.none )
 
 -- subscriptions
 
 subscriptions: Model -> Sub Msg
 subscriptions model =
-  WebSocket.listen webSocketServer IncomingMessage
+  WebSocket.listen webSocketServer UpdateModel
 
 -- view
 
@@ -84,19 +151,28 @@ view : Model -> Html Msg
 view model =
   div []
     [ input [ placeholder "Username"
-            , onInput UserNameInput
-            , value model.username
+            , onInput InputUsername
+            , value model.currentPlayerUsername
             ] []
     , div []
-        [ input [ placeholder "payload to send"
-                , onInput PayloadInput
-                , value model.payload
+        [ input [ placeholder "Match Name"
+                , onInput InputMatchName
+                , value model.match.name
                 ] []
-        , button [onClick Send] [ text "Send" ]
+        , button [onClick FindMatch] [ text "FindMatch" ]
         ]
-    , div [] (List.map viewResult model.results)
+      -- Display player actions here.
+    , div []
+        [
+          button [ onClick (ChooseAction Shoot) ] [ text "Shoot" ]
+        ]
+    , div []
+        [
+          button [ onClick LockInAction ] [text "Lock In"]
+        ]
+    -- , div [] (List.map viewResult model.results)
     ]
 
-viewResult: String -> Html Msg
-viewResult result =
-  div [] [ text result ]
+-- viewResult: String -> Html Msg
+-- viewResult result =
+--   div [] [ text result ]
