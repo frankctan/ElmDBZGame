@@ -5,6 +5,7 @@ import WebSocket
 import Model exposing (..)
 import Msg exposing (..)
 import Json.Encode
+import Strings as S exposing (..)
 
 wsListen: () -> Sub Msg
 wsListen () =
@@ -32,8 +33,8 @@ webSocketServer =
 encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
 encodeJsonFindMatch record =
   Json.Encode.object
-    [ ("username",  Json.Encode.string <| record.username)
-    , ("matchName",  Json.Encode.string <| record.matchName)
+    [ (S.usernameKey,  Json.Encode.string <| record.username)
+    , (S.matchNameKey,  Json.Encode.string <| record.matchName)
     ]
 
 encodeFindMatchToStr: JsonFindMatch -> String
@@ -43,9 +44,9 @@ encodeFindMatchToStr record =
 encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
 encodeJsonPlayerAction record =
   Json.Encode.object
-    [ ("username",  Json.Encode.string <| record.username)
-    , ("matchName",  Json.Encode.string <| record.matchName)
-    , ("playerAction",  Json.Encode.string <| toString <| record.playerAction)
+    [ (S.usernameKey,  Json.Encode.string <| record.username)
+    , (S.matchNameKey,  Json.Encode.string <| record.matchName)
+    , (S.playerAction,  Json.Encode.string <| toString <| record.playerAction)
     ]
 
 encodePlayerActionToStr: JsonPlayerAction -> String
