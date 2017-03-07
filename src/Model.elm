@@ -1,4 +1,5 @@
 module Model exposing (..)
+import Strings as S exposing (..)
 
 type PlayerAction
    = Block
@@ -27,12 +28,14 @@ type alias Match =
 -- JSON records
 
 type alias JsonFindMatch =
-  { username: String
+  { type_: String
+  , username: String
   , matchName: String
   }
 
 type alias JsonPlayerAction =
-  { username: String
+  { type_: String
+  , username: String
   , matchName: String
   , playerAction: PlayerAction
   }
@@ -41,11 +44,15 @@ type alias JsonPlayerAction =
 
 jsonFindMatchInit: Model -> JsonFindMatch
 jsonFindMatchInit model =
-  JsonFindMatch model.currentPlayerUsername model.match.name
+  JsonFindMatch
+    S.jsonFindMatchType
+    model.currentPlayerUsername
+    model.match.name
 
 jsonPlayerActionInit: Model -> JsonPlayerAction
 jsonPlayerActionInit model =
   JsonPlayerAction
+    S.jsonPlayerActionType
     model.currentPlayerUsername
     model.match.name
     model.selectedAction
