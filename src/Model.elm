@@ -58,3 +58,9 @@ jsonPlayerActionInit model =
     model.matchName
     model.currentPlayer.uuid
     model.selectedAction
+
+-- Equatable
+
+playerEquatable: Player -> Player -> Bool
+playerEquatable p1 p2 =
+  p1.uuid == p2.uuid
