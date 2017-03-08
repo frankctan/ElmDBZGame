@@ -51,34 +51,66 @@ subscriptions model =
 
 -- view
 
-view : Model -> Html Msg
-view model =
+signInView: Model -> Html Msg
+signInView model =
   div []
-    [ input [ placeholder "Username"
-            , onInput InputUsername
-            , value model.currentPlayerUsername
-            ] []
+    [ div []
+      [ input [ placeholder "Username"
+              , onInput InputUsername
+              , value model.currentPlayerUsername
+              ] [] ]
     , div []
         [ input [ placeholder "Match Name"
                 , onInput InputMatchName
                 , value model.match.name
-                ] []
-        , input [ placeholder "uuid"
-                , value model.uuid
-                ] []
-        , button [ onClick FindMatch ] [ text "FindMatch" ]
-        ]
-      -- Display player actions here.
+                ] [] ]
     , div []
-        [
-          button [ onClick (ChooseAction Shoot) ] [ text "Shoot" ]
-        ]
-    , div []
-        [
-          button [ onClick LockInAction ] [text "Lock In"]
-        ]
-    -- , div [] (List.map viewResult model.results)
+        [ button [ onClick FindMatch ] [text "Find Match"] ]
     ]
+
+matchFindView: Model -> Html Msg
+matchFindView model =
+  div []
+    [ div [] [ text model.currentPlayerUsername ]
+    , div [] [ text model.match.name ]
+    , div [] [ text "finding match..." ]
+    ]
+
+view : Model -> Html Msg
+view model =
+  if model.uuid == "" then
+    signInView model
+  else
+    matchFindView model
+
+
+
+  -- div []
+  --   [ input [ placeholder "Username"
+  --           , onInput InputUsername
+  --           , value model.currentPlayerUsername
+  --           ] []
+  --   , div []
+  --       [ input [ placeholder "Match Name"
+  --               , onInput InputMatchName
+  --               , value model.match.name
+  --               ] []
+  --       , input [ placeholder "uuid"
+  --               , value model.uuid
+  --               ] []
+  --       , button [ onClick FindMatch ] [ text "FindMatch" ]
+  --       ]
+  --     -- Display player actions here.
+  --   , div []
+  --       [
+  --         button [ onClick (ChooseAction Shoot) ] [ text "Shoot" ]
+  --       ]
+  --   , div []
+  --       [
+  --         button [ onClick LockInAction ] [text "Lock In"]
+  --       ]
+  --   -- , div [] (List.map viewResult model.results)
+  --   ]
 
 -- viewResult: String -> Html Msg
 -- viewResult result =
