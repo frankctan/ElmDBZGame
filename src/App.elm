@@ -8,8 +8,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
-import Dict exposing (..)
-
 -- init
 init: (Model, Cmd Msg)
 init =
@@ -36,11 +34,21 @@ update msg model =
       ( model, wsSendPlayerAction model )
 
     UpdateModel str ->
-      let dict = decodeJsonString str
-          uuidStr = case (get "uuid" dict) of
-            Just uid -> uid
-            Nothing -> "" in
-              (updateCurrentPlayerUUID model uuidStr, Cmd.none )
+      let
+        player = decodePlayer str emptyPlayer
+
+        opposingPlayers_ =
+          List.foldl
+          (\p acc -> if (playerEquatable player p) then player :: acc else acc)
+          []
+          model.opposingPlayers
+
+        currentPlayer_ =
+           if (playerEquatable player model.currentPlayer)
+             then player
+             else model.currentPlayer
+      in
+        ( { model | opposingPlayers = opposingPlayers_, currentPlayer = currentPlayer_ }, Cmd.none )
 
 updateCurrentPlayerUsername: Model -> String -> Model
 updateCurrentPlayerUsername model str =
