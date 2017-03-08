@@ -1,24 +1,29 @@
 module WebSocketsComm exposing ( wsListen
                                , wsSendFindMatch
                                , wsSendPlayerAction
-                               , decodeJsonString )
+                               , decodeJsonString
+                               , decodePlayer )
 import WebSocket
 import Model exposing (..)
 import Msg exposing (..)
 import Json.Encode
 import Json.Decode
 import Strings as S exposing (..)
-import Dict exposing (..)
 
 wsListen: () -> Sub Msg
 wsListen () =
   WebSocket.listen webSocketServer UpdateModel
 
-decodeJsonString: String -> (Dict String String)
+decodeJsonString: String -> List (String, String)
 decodeJsonString json =
-  case Json.Decode.decodeString (Json.Decode.dict Json.Decode.string) json of
+  case Json.Decode.decodeString (Json.Decode.keyValuePairs Json.Decode.string) json of
     Ok value -> value
-    Err error -> singleton "Error" error
+    Err error -> List.singleton ("Error", error)
+
+decodePlayer: String -> Player -> Player
+decodePlayer json player =
+  let kv = decodeJsonString json in
+  List.foldl decodePlayerAccumulator player kv
 
 wsSendFindMatch: Model -> Cmd Msg
 wsSendFindMatch model =
@@ -33,6 +38,15 @@ wsSendPlayerAction model =
     <| jsonPlayerActionInit model
 
 -- HELPER METHODS
+
+decodePlayerAccumulator: (String, String) -> Player -> Player
+decodePlayerAccumulator (key, data) acc =
+  case key of
+    "UUID" -> { acc | uuid = data }
+    "username" -> { acc | username = data }
+    "charges" -> { acc | charges = (Result.withDefault 0 <| String.toInt data)}
+    "Error" -> acc
+    _ -> acc
 
 webSocketServer : String
 webSocketServer =
