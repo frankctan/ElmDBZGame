@@ -20,7 +20,7 @@ type alias Player =
   , username: String
   , charges: Int
   , health: Int
-  -- , actionHistory: [PlayerAction]
+  , actionHistory: List PlayerAction
   }
 
 -- JSON records
