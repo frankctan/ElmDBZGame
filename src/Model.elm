@@ -8,7 +8,8 @@ type PlayerAction
    | Steal
 
 type alias Model =
-  { currentPlayerUsername: String
+  { uuid: String
+  , currentPlayerUsername: String
   , selectedAction: PlayerAction
   , match: Match
   }
