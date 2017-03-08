@@ -43,7 +43,7 @@ modelInit: Model
 modelInit = Model emptyPlayer Block [] "" 0
 
 emptyPlayer: Player
-emptyPlayer = Player "" "" 0 0
+emptyPlayer = Player "" "" 0 0 []
 
 jsonFindMatchInit: Model -> JsonFindMatch
 jsonFindMatchInit model =
