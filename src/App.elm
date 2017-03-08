@@ -44,13 +44,17 @@ update msg model =
 
 updateCurrentPlayerUsername: Model -> String -> Model
 updateCurrentPlayerUsername model str =
-  let cp = model.currentPlayer in
-    { model | currentPlayer = Player cp.uuid str cp.charges cp.health }
+  let
+    oldPlayer = model.currentPlayer
+  in
+    { model | currentPlayer = { oldPlayer | username = str } }
 
 updateCurrentPlayerUUID: Model -> String -> Model
 updateCurrentPlayerUUID model str =
-  let cp = model.currentPlayer in
-    { model | currentPlayer = Player str cp.username cp.charges cp.health }
+    let
+      oldPlayer = model.currentPlayer
+    in
+      { model | currentPlayer = { oldPlayer | uuid = str } }
 
 -- subscriptions
 
