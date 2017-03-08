@@ -29,15 +29,14 @@ type alias Match =
 -- JSON records
 
 type alias JsonFindMatch =
-  { type_: String
-  , username: String
+  { username: String
   , matchName: String
   }
 
 type alias JsonPlayerAction =
-  { type_: String
-  , username: String
+  { username: String
   , matchName: String
+  , uuid: String
   , playerAction: PlayerAction
   }
 
@@ -46,14 +45,13 @@ type alias JsonPlayerAction =
 jsonFindMatchInit: Model -> JsonFindMatch
 jsonFindMatchInit model =
   JsonFindMatch
-    S.jsonFindMatchType
     model.currentPlayerUsername
     model.match.name
 
 jsonPlayerActionInit: Model -> JsonPlayerAction
 jsonPlayerActionInit model =
   JsonPlayerAction
-    S.jsonPlayerActionType
     model.currentPlayerUsername
     model.match.name
+    model.uuid
     model.selectedAction

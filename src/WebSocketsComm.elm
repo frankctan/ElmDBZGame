@@ -41,8 +41,7 @@ webSocketServer =
 encodeJsonFindMatch : JsonFindMatch -> Json.Encode.Value
 encodeJsonFindMatch record =
   Json.Encode.object
-    [ (S.typeKey,  Json.Encode.string <| record.type_)
-    , (S.usernameKey,  Json.Encode.string <| record.username)
+    [ (S.usernameKey,  Json.Encode.string <| record.username)
     , (S.matchNameKey,  Json.Encode.string <| record.matchName)
     ]
 
@@ -53,10 +52,10 @@ encodeFindMatchToStr record =
 encodeJsonPlayerAction : JsonPlayerAction -> Json.Encode.Value
 encodeJsonPlayerAction record =
   Json.Encode.object
-    [ (S.typeKey,  Json.Encode.string <| S.jsonPlayerActionType)
-    , (S.usernameKey,  Json.Encode.string <| record.username)
+    [ (S.usernameKey,  Json.Encode.string <| record.username)
     , (S.matchNameKey,  Json.Encode.string <| record.matchName)
-    , (S.playerAction,  Json.Encode.string <| toString <| record.playerAction)
+    , (S.uuidKey,  Json.Encode.string <| record.uuid)
+    , (S.playerActionKey,  Json.Encode.string <| toString <| record.playerAction)
     ]
 
 encodePlayerActionToStr: JsonPlayerAction -> String
