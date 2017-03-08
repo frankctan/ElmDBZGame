@@ -35,7 +35,7 @@ update msg model =
 
     UpdateModel str ->
       let
-        player = decodePlayer str emptyPlayer
+        player = decodePlayer (Debug.log "json" str) emptyPlayer
 
         opposingPlayers_ =
           List.foldl
@@ -44,9 +44,11 @@ update msg model =
           model.opposingPlayers
 
         currentPlayer_ =
-           if (playerEquatable player model.currentPlayer)
-             then player
-             else model.currentPlayer
+          -- Special case the scenario in which the current player doesn't have a uuid yet.
+          if model.currentPlayer.uuid == "" then player else
+            if (playerEquatable player model.currentPlayer)
+               then player
+               else model.currentPlayer
       in
         ( { model | opposingPlayers = opposingPlayers_, currentPlayer = currentPlayer_ }, Cmd.none )
 
@@ -96,6 +98,8 @@ matchView model =
   div []
     [ div [] [ text model.currentPlayer.username ]
     , div [] [ text model.matchName ]
+    , div [] [ text (toString model.currentPlayer.health) ]
+    , div [] [ text model.currentPlayer.uuid ]
     , findingMatch model
     ]
 

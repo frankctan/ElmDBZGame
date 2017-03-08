@@ -23,7 +23,7 @@ decodeJsonString json =
 decodePlayer: String -> Player -> Player
 decodePlayer json player =
   let kv = decodeJsonString json in
-  List.foldl decodePlayerAccumulator player kv
+  List.foldl decodePlayerAccumulator player (Debug.log "kv" kv)
 
 wsSendFindMatch: Model -> Cmd Msg
 wsSendFindMatch model =
@@ -42,9 +42,11 @@ wsSendPlayerAction model =
 decodePlayerAccumulator: (String, String) -> Player -> Player
 decodePlayerAccumulator (key, data) acc =
   case key of
-    "UUID" -> { acc | uuid = data }
+    "uuid" -> { acc | uuid = (Debug.log "uuid" data) }
     "username" -> { acc | username = data }
     "charges" -> { acc | charges = (Result.withDefault 0 <| String.toInt data)}
+    "health" -> { acc | health = (Result.withDefault 0 <| String.toInt data)}
+    "actionHistory" -> acc
     "Error" -> acc
     _ -> acc
 
