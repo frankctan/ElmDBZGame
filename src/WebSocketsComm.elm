@@ -1,16 +1,24 @@
 module WebSocketsComm exposing ( wsListen
                                , wsSendFindMatch
-                               , wsSendPlayerAction )
+                               , wsSendPlayerAction
+                               , decodeJsonString )
 import WebSocket
 import Model exposing (..)
 import Msg exposing (..)
 import Json.Encode
+import Json.Decode
 import Strings as S exposing (..)
+import Dict exposing (..)
 
 wsListen: () -> Sub Msg
 wsListen () =
   WebSocket.listen webSocketServer UpdateModel
 
+decodeJsonString: String -> (Dict String String)
+decodeJsonString json =
+  case Json.Decode.decodeString (Json.Decode.dict Json.Decode.string) json of
+    Ok value -> value
+    Err error -> singleton "Error" error
 
 wsSendFindMatch: Model -> Cmd Msg
 wsSendFindMatch model =

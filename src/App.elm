@@ -8,10 +8,12 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
+import Dict exposing (..)
+
 -- init
 init: (Model, Cmd Msg)
 init =
-  (Model "" Block (Match "" [] 0), Cmd.none)
+  (Model "" "" Block (Match "" [] 0), Cmd.none)
 
 -- update
 
@@ -35,8 +37,11 @@ update msg model =
       ( model, wsSendPlayerAction model )
 
     UpdateModel str ->
-      -- TODO: Update model based on server
-      ( model, Cmd.none )
+      let dict = decodeJsonString str
+          uuidStr = case (get "uuid" dict) of
+            Just uid -> uid
+            Nothing -> "" in
+              ( { model | uuid = uuidStr } , Cmd.none )
 
 -- subscriptions
 
@@ -58,7 +63,10 @@ view model =
                 , onInput InputMatchName
                 , value model.match.name
                 ] []
-        , button [onClick FindMatch] [ text "FindMatch" ]
+        , input [ placeholder "uuid"
+                , value model.uuid
+                ] []
+        , button [ onClick FindMatch ] [ text "FindMatch" ]
         ]
       -- Display player actions here.
     , div []
