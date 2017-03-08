@@ -1,5 +1,5 @@
 module Model exposing (..)
-import Strings as S exposing (..)
+-- import Strings as S exposing (..)
 
 type PlayerAction
    = Block
@@ -8,22 +8,19 @@ type PlayerAction
    | Steal
 
 type alias Model =
-  { uuid: String
-  , currentPlayerUsername: String
+  { currentPlayer: Player
   , selectedAction: PlayerAction
-  , match: Match
+  , opposingPlayers: List Player
+  , matchName: String
+  , turnNumber: Int
   }
 
 type alias Player =
-  { username: String
+  { uuid: String
+  , username: String
   , charges: Int
   , health: Int
-  }
-
-type alias Match =
-  { name: String
-  , players: List Player
-  , turnNumber: Int
+  -- , actionHistory: [PlayerAction]
   }
 
 -- JSON records
@@ -42,16 +39,22 @@ type alias JsonPlayerAction =
 
 -- INIT
 
+modelInit: Model
+modelInit = Model emptyPlayer Block [] "" 0
+
+emptyPlayer: Player
+emptyPlayer = Player "" "" 0 0
+
 jsonFindMatchInit: Model -> JsonFindMatch
 jsonFindMatchInit model =
   JsonFindMatch
-    model.currentPlayerUsername
-    model.match.name
+    model.currentPlayer.username
+    model.matchName
 
 jsonPlayerActionInit: Model -> JsonPlayerAction
 jsonPlayerActionInit model =
   JsonPlayerAction
-    model.currentPlayerUsername
-    model.match.name
-    model.uuid
+    model.currentPlayer.username
+    model.matchName
+    model.currentPlayer.uuid
     model.selectedAction

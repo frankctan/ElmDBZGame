@@ -13,7 +13,7 @@ import Dict exposing (..)
 -- init
 init: (Model, Cmd Msg)
 init =
-  (Model "" "" Block (Match "" [] 0), Cmd.none)
+  (modelInit, Cmd.none)
 
 -- update
 
@@ -21,11 +21,10 @@ update: Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     InputUsername str ->
-      ( { model | currentPlayerUsername = str }, Cmd.none )
+      ( updateCurrentPlayerUsername model str, Cmd.none )
 
     InputMatchName str ->
-      let m = model.match in
-        ( { model | match = Match str m.players m.turnNumber }, Cmd.none )
+      ( { model | matchName = str }, Cmd.none )
 
     FindMatch ->
       ( model, wsSendFindMatch model )
@@ -41,7 +40,17 @@ update msg model =
           uuidStr = case (get "uuid" dict) of
             Just uid -> uid
             Nothing -> "" in
-              ( { model | uuid = uuidStr } , Cmd.none )
+              (updateCurrentPlayerUUID model uuidStr, Cmd.none )
+
+updateCurrentPlayerUsername: Model -> String -> Model
+updateCurrentPlayerUsername model str =
+  let cp = model.currentPlayer in
+    { model | currentPlayer = Player cp.uuid str cp.charges cp.health }
+
+updateCurrentPlayerUUID: Model -> String -> Model
+updateCurrentPlayerUUID model str =
+  let cp = model.currentPlayer in
+    { model | currentPlayer = Player str cp.username cp.charges cp.health }
 
 -- subscriptions
 
@@ -57,33 +66,37 @@ signInView model =
     [ div []
       [ input [ placeholder "Username"
               , onInput InputUsername
-              , value model.currentPlayerUsername
-              ] [] ]
+              , value model.currentPlayer.username
+              ] []
+      ]
     , div []
         [ input [ placeholder "Match Name"
                 , onInput InputMatchName
-                , value model.match.name
-                ] [] ]
+                , value model.matchName
+                ] []
+        ]
     , div []
         [ button [ onClick FindMatch ] [text "Find Match"] ]
     ]
 
-matchFindView: Model -> Html Msg
-matchFindView model =
+matchView: Model -> Html Msg
+matchView model =
   div []
-    [ div [] [ text model.currentPlayerUsername ]
-    , div [] [ text model.match.name ]
-    , div [] [ text "finding match..." ]
+    [ div [] [ text model.currentPlayer.username ]
+    , div [] [ text model.matchName ]
+    , findingMatch model
     ]
+
+findingMatch: Model -> Html Msg
+findingMatch model =
+  div [] [text "finding match..."]
 
 view : Model -> Html Msg
 view model =
-  if model.uuid == "" then
+  if model.currentPlayer.uuid == "" then
     signInView model
   else
-    matchFindView model
-
-
+    matchView model
 
   -- div []
   --   [ input [ placeholder "Username"
