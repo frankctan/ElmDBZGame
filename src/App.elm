@@ -120,15 +120,44 @@ signInView model =
 matchView: Model -> Html Msg
 matchView model =
   div []
-    [ div [] [ text model.currentPlayer.username ]
-    , div [] [ text model.matchName ]
-    , div [] [ text (toString model.currentPlayer.health) ]
-    , div [] [ text model.currentPlayer.uuid ]
-    , findingMatch model
+    [ div [] [ text <| String.append "matchName:" model.matchName ]
+    , playerStatsView model.currentPlayer
+    , if List.length model.opposingPlayers == 0 then
+        findingMatchView model
+      else
+        div []
+        [ playerActionButtonsView
+        -- TODO: Support multiple players. For now, enforce 2 player requirement.
+        , playerStatsView
+          <| Maybe.withDefault emptyPlayer
+          <| List.head model.opposingPlayers
+        ]
     ]
 
-findingMatch: Model -> Html Msg
-findingMatch model =
+playerStatsView: Player -> Html Msg
+playerStatsView player =
+  div []
+  [ div [] [ text player.username ]
+  , div [] [ text <| String.append "health: " <| toString player.health ]
+  , div [] [ text <| String.append "charges: " <| toString player.charges ]
+  ]
+
+playerActionButtonsView: Html Msg
+playerActionButtonsView =
+  div []
+  [ div []
+    [ button [ onClick (ChooseAction Shoot) ] [ text "Shoot" ]
+    , button [ onClick (ChooseAction Block) ] [ text "Block" ]
+    , button [ onClick (ChooseAction Charge) ] [ text "Charge" ]
+    , button [ onClick (ChooseAction Steal) ] [ text "Steal" ]
+    ]
+  , div []
+    [ button [ onClick LockInAction ] [ text "Lock In" ]
+    ]
+  ]
+
+findingMatchView: Model -> Html Msg
+findingMatchView model =
   div [] [text "finding match..."]
 
 view : Model -> Html Msg
@@ -137,34 +166,3 @@ view model =
     signInView model
   else
     matchView model
-
-  -- div []
-  --   [ input [ placeholder "Username"
-  --           , onInput InputUsername
-  --           , value model.currentPlayerUsername
-  --           ] []
-  --   , div []
-  --       [ input [ placeholder "Match Name"
-  --               , onInput InputMatchName
-  --               , value model.match.name
-  --               ] []
-  --       , input [ placeholder "uuid"
-  --               , value model.uuid
-  --               ] []
-  --       , button [ onClick FindMatch ] [ text "FindMatch" ]
-  --       ]
-  --     -- Display player actions here.
-  --   , div []
-  --       [
-  --         button [ onClick (ChooseAction Shoot) ] [ text "Shoot" ]
-  --       ]
-  --   , div []
-  --       [
-  --         button [ onClick LockInAction ] [text "Lock In"]
-  --       ]
-  --   -- , div [] (List.map viewResult model.results)
-  --   ]
-
--- viewResult: String -> Html Msg
--- viewResult result =
---   div [] [ text result ]
