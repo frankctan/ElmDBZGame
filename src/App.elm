@@ -36,21 +36,45 @@ update msg model =
     UpdateModel str ->
       let
         player = decodePlayer (Debug.log "json" str) emptyPlayer
-
-        opposingPlayers_ =
-          List.foldl
-          (\p acc -> if (playerEquatable player p) then player :: acc else acc)
-          []
-          model.opposingPlayers
-
-        currentPlayer_ =
-          -- Special case the scenario in which the current player doesn't have a uuid yet.
-          if model.currentPlayer.uuid == "" then player else
-            if (playerEquatable player model.currentPlayer)
-               then player
-               else model.currentPlayer
+        ( currentPlayer_, opposingPlayers_ ) = updatePlayers player model
       in
-        ( { model | opposingPlayers = opposingPlayers_, currentPlayer = currentPlayer_ }, Cmd.none )
+        ( { model
+            | opposingPlayers = (Debug.log "opposingPlayers:" opposingPlayers_)
+            , currentPlayer = currentPlayer_
+          }, Cmd.none )
+
+updatePlayers: Player -> Model -> ( Player, List Player )
+updatePlayers player model =
+  let
+    currentPlayer_ =
+      if model.currentPlayer.uuid == "" ||
+         ( playerEquatable player model.currentPlayer ) then
+           player
+      else
+        model.currentPlayer
+
+    opposingPlayers_ =
+      if not (playerEquatable player currentPlayer_) then
+        updateOpposingPlayers player model.opposingPlayers
+      else
+        model.opposingPlayers
+  in
+    ( currentPlayer_, opposingPlayers_ )
+
+updateOpposingPlayers: Player -> List Player -> List Player
+updateOpposingPlayers newPlayer oldList =
+  let uuids = List.map .uuid oldList in
+    if (List.member newPlayer.uuid uuids) then
+      List.foldl
+        (\p acc ->
+          if (playerEquatable newPlayer p) then
+            newPlayer :: acc
+          else
+            p :: acc)
+        []
+        oldList
+    else
+      newPlayer :: oldList
 
 updateCurrentPlayerUsername: Model -> String -> Model
 updateCurrentPlayerUsername model str =
