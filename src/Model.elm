@@ -1,6 +1,7 @@
 module Model exposing (..)
 -- import Strings as S exposing (..)
 
+-- TODO: Add Reflect player action.
 type PlayerAction
    = Block
    | Charge
