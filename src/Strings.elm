@@ -2,5 +2,5 @@ module Strings exposing (..)
 
 usernameKey = "username"
 matchNameKey = "matchName"
-uuidKey = "playerUUID"
+uuidKey = "uuid"
 playerActionKey = "playerAction"
