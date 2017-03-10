@@ -40,7 +40,7 @@ update msg model =
       in
         ( { model
             | opposingPlayers = (Debug.log "opposingPlayers:" opposingPlayers_)
-            , currentPlayer = currentPlayer_
+            , currentPlayer = Debug.log "currentPlayer:" currentPlayer_
           }, Cmd.none )
 
 updatePlayers: Player -> Model -> ( Player, List Player )

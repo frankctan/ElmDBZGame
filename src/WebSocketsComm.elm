@@ -10,6 +10,10 @@ import Json.Encode
 import Json.Decode
 import Strings as S exposing (..)
 
+decodePlayerActionList : Json.Decode.Decoder (List PlayerAction)
+decodePlayerActionList =
+  Json.Decode.list decodePlayerAction
+
 wsListen: () -> Sub Msg
 wsListen () =
   WebSocket.listen webSocketServer UpdateModel
@@ -39,6 +43,19 @@ wsSendPlayerAction model =
 
 -- HELPER METHODS
 
+fromStringPlayerAction : String -> Json.Decode.Decoder PlayerAction
+fromStringPlayerAction string =
+    case string of
+        "Block" -> Json.Decode.succeed Block
+        "Charge" -> Json.Decode.succeed Charge
+        "Shoot" -> Json.Decode.succeed Shoot
+        "Steal" -> Json.Decode.succeed Steal
+        _ -> Json.Decode.fail "Error"
+
+decodePlayerAction : Json.Decode.Decoder PlayerAction
+decodePlayerAction =
+  Json.Decode.andThen fromStringPlayerAction Json.Decode.string
+
 decodePlayerAccumulator: (String, String) -> Player -> Player
 decodePlayerAccumulator (key, data) acc =
   case key of
@@ -46,7 +63,7 @@ decodePlayerAccumulator (key, data) acc =
     "username" -> { acc | username = data }
     "charges" -> { acc | charges = (Result.withDefault 0 <| String.toInt data)}
     "health" -> { acc | health = (Result.withDefault 0 <| String.toInt data)}
-    "actionHistory" -> acc
+    "actionHistory" -> { acc | actionHistory = (Result.withDefault [] <| Json.Decode.decodeString decodePlayerActionList data) }
     "Error" -> acc
     _ -> acc
 
