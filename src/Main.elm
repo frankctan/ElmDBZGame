@@ -1,7 +1,8 @@
 module Main exposing (..)
 
 import App exposing (..)
-import Html exposing (program)
+import Update exposing (..)
+import Html exposing ( program )
 
 main =
   program

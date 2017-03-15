@@ -3,12 +3,13 @@ module WebSocketsComm exposing ( wsListen
                                , wsSendPlayerAction
                                , decodeJsonString
                                , decodePlayer )
-import WebSocket
 import Model exposing (..)
 import Msg exposing (..)
+import Strings as S exposing (..)
+
+import WebSocket
 import Json.Encode
 import Json.Decode
-import Strings as S exposing (..)
 
 decodePlayerActionList : Json.Decode.Decoder (List PlayerAction)
 decodePlayerActionList =
