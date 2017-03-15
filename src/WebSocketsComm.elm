@@ -20,7 +20,10 @@ wsListen () =
 
 decodeJsonString: String -> List (String, String)
 decodeJsonString json =
-  case Json.Decode.decodeString (Json.Decode.keyValuePairs Json.Decode.string) json of
+  case Json.Decode.decodeString
+    (Json.Decode.keyValuePairs Json.Decode.string)
+    json
+  of
     Ok value -> value
     Err error -> List.singleton ("Error", error)
 
@@ -63,7 +66,10 @@ decodePlayerAccumulator (key, data) acc =
     "username" -> { acc | username = data }
     "charges" -> { acc | charges = (Result.withDefault 0 <| String.toInt data)}
     "health" -> { acc | health = (Result.withDefault 0 <| String.toInt data)}
-    "actionHistory" -> { acc | actionHistory = (Result.withDefault [] <| Json.Decode.decodeString decodePlayerActionList data) }
+    "actionHistory" ->
+      { acc | actionHistory =
+        ( Result.withDefault []
+        <| Json.Decode.decodeString decodePlayerActionList data ) }
     "Error" -> acc
     _ -> acc
 
@@ -88,7 +94,8 @@ encodeJsonPlayerAction record =
     [ (S.usernameKey,  Json.Encode.string <| record.username)
     , (S.matchNameKey,  Json.Encode.string <| record.matchName)
     , (S.uuidKey,  Json.Encode.string <| record.uuid)
-    , (S.playerActionKey,  Json.Encode.string <| toString <| record.playerAction)
+    , (S.playerActionKey,
+        Json.Encode.string <| toString <| record.playerAction)
     ]
 
 encodePlayerActionToStr: JsonPlayerAction -> String

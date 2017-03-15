@@ -127,7 +127,7 @@ matchView model =
       else
         div []
         [ playerActionButtonsView
-        -- TODO: Support multiple players. For now, enforce 2 player requirement.
+        -- TODO: Enforce 2 player requirement.
         , playerStatsView
           <| Maybe.withDefault emptyPlayer
           <| List.head model.opposingPlayers
