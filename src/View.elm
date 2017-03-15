@@ -11,8 +11,8 @@ view : Model -> Html Msg
 view model =
   if model.currentPlayer.uuid == "" then
     signInView model
-    else
-      matchView model
+  else
+    matchView model
 
 signInView: Model -> Html Msg
 signInView model =
