@@ -75,3 +75,7 @@ playerActionButtonsView =
 findingMatchView: Model -> Html Msg
 findingMatchView model =
   div [] [text "finding match..."]
+
+playerActionDescription: PlayerAction -> Player -> String
+playerActionDescription playerAction player =
+  toString playerAction

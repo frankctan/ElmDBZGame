@@ -1,12 +1,13 @@
 module Model exposing (..)
 -- import Strings as S exposing (..)
 
--- TODO: Add Reflect player action.
+-- TODO: Ensure all actions are registered properly on server.
 type PlayerAction
    = Block
    | Charge
    | Shoot
    | Steal
+   | Reflect
 
 type alias Model =
   { currentPlayer: Player

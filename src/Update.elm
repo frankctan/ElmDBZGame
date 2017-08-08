@@ -32,6 +32,7 @@ update msg model =
             , currentPlayer = Debug.log "currentPlayer:" currentPlayer_
           }, Cmd.none )
 
+-- TODO: This should just update the model instead of returning two new players
 updatePlayers: Player -> Model -> ( Player, List Player )
 updatePlayers player model =
   let

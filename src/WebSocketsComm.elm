@@ -54,6 +54,7 @@ fromStringPlayerAction string =
         "Charge" -> Json.Decode.succeed Charge
         "Shoot" -> Json.Decode.succeed Shoot
         "Steal" -> Json.Decode.succeed Steal
+        "Reflect" -> Json.Decode.succeed Reflect
         _ -> Json.Decode.fail "Error"
 
 decodePlayerAction : Json.Decode.Decoder PlayerAction
