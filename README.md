@@ -1,7 +1,3 @@
-# Elm DBZ Game
-
-This project is bootstrapped with [Create Elm App](https://github.com/halfzebra/create-elm-app).
-
 # ElmDBZ
 
 ![ElmDBZgif](http://i.imgur.com/NGYNlYA.gif)
